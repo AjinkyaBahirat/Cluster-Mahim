@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -17,15 +17,13 @@ export const AuthProvider = ({ children }) => {
       const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (storedToken) {
         try {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-          const res = await axios.get('/api/auth/me');
+          const res = await api.get('/auth/me');
           setUser(res.data.user);
           setToken(storedToken);
         } catch (err) {
           console.error('Failed to restore session', err);
           localStorage.removeItem('token');
           sessionStorage.removeItem('token');
-          delete axios.defaults.headers.common['Authorization'];
           setUser(null);
           setToken(null);
         }
@@ -39,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (phone, password, role, rememberMe) => {
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', { phone, password, role, rememberMe });
+      const res = await api.post('/auth/login', { phone, password, role, rememberMe });
       const { token: newToken, user: newUser } = res.data;
 
       if (rememberMe) {
@@ -50,7 +48,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token'); // Clear persistent storage
       }
 
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       setUser(newUser);
       setToken(newToken);
       setLoading(false);
@@ -64,7 +61,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setToken(null);
     navigate('/login');
