@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+console.log('--- VITE_API_URL during build:', process.env.VITE_API_URL || 'NOT DEFINED');
+
 export default defineConfig({
   plugins: [react()],
   server: {
