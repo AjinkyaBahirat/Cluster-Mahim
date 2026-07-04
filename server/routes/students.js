@@ -130,7 +130,10 @@ router.post('/', async (req, res) => {
     await db.query('BEGIN');
     try {
       for (const record of records) {
-        if (record.standard < 1 || record.standard > 12) {
+        const std = parseInt(record.standard, 10);
+        const boys = parseInt(record.total_boys, 10) || 0;
+        const girls = parseInt(record.total_girls, 10) || 0;
+        if (isNaN(std) || std < 1 || std > 12) {
           throw new Error(`Invalid standard: ${record.standard}. Must be between 1 and 12.`);
         }
         await db.query(`
@@ -143,9 +146,9 @@ router.post('/', async (req, res) => {
             updated_at = CURRENT_TIMESTAMP
         `, [
           schoolId,
-          record.standard,
-          record.total_boys || 0,
-          record.total_girls || 0,
+          std,
+          boys,
+          girls,
           year
         ]);
       }

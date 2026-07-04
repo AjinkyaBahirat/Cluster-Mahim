@@ -161,7 +161,7 @@ const SchoolDetailPage = () => {
       fetchSchoolDetail();
     } catch (err) {
       console.error(err);
-      showToast('Failed to save metrics', 'error');
+      showToast(err.response?.data?.error || 'Failed to save metrics', 'error');
     } finally {
       setSavingMetrics(false);
     }

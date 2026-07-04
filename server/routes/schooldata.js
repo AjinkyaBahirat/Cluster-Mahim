@@ -70,6 +70,13 @@ router.post('/', async (req, res) => {
       return res.status(403).json({ error: 'Access denied.' });
     }
 
+    // Parse numeric fields explicitly to avoid PostgreSQL type string matching errors
+    const parsedTotal = parseInt(total_students, 10) || 0;
+    const parsedMale = parseInt(male_students, 10) || 0;
+    const parsedFemale = parseInt(female_students, 10) || 0;
+    const parsedUniforms = parseInt(uniform_distributed, 10) || 0;
+    const parsedBooks = parseInt(books_distributed, 10) || 0;
+
     // Check if record exists
     const record = await db.get('SELECT id FROM school_data WHERE school_id = ? AND academic_year = ?', [schoolId, academic_year]);
 
@@ -86,12 +93,12 @@ router.post('/', async (req, res) => {
             holding_account_number = ?,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-      `, [total_students || 0, male_students || 0, female_students || 0, uniform_distributed || 0, books_distributed || 0, cctv_available || 'no', toilets_available || 'no', holding_account_number || null, record.id]);
+      `, [parsedTotal, parsedMale, parsedFemale, parsedUniforms, parsedBooks, cctv_available || 'no', toilets_available || 'no', holding_account_number || null, record.id]);
     } else {
       await db.query(`
         INSERT INTO school_data (school_id, total_students, male_students, female_students, uniform_distributed, books_distributed, cctv_available, toilets_available, holding_account_number, academic_year)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [schoolId, total_students || 0, male_students || 0, female_students || 0, uniform_distributed || 0, books_distributed || 0, cctv_available || 'no', toilets_available || 'no', holding_account_number || null, academic_year]);
+      `, [schoolId, parsedTotal, parsedMale, parsedFemale, parsedUniforms, parsedBooks, cctv_available || 'no', toilets_available || 'no', holding_account_number || null, academic_year]);
     }
 
     const updated = await db.get('SELECT * FROM school_data WHERE school_id = ? AND academic_year = ?', [schoolId, academic_year]);
