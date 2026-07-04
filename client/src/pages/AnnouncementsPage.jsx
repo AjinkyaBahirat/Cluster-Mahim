@@ -16,6 +16,8 @@ const AnnouncementsPage = () => {
   const [previewData, setPreviewData] = useState([]);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewTitle, setPreviewTitle] = useState('');
+  const [previewType, setPreviewType] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
   const [toast, setToast] = useState(null);
 
   // Form states
@@ -72,6 +74,7 @@ const AnnouncementsPage = () => {
 
   const handlePreviewCsv = async (ann) => {
     setPreviewTitle(language === 'en' ? ann.title : (ann.title_mr || ann.title));
+    setPreviewType('csv');
     setPreviewLoading(true);
     setIsPreviewModalOpen(true);
     try {
@@ -90,6 +93,13 @@ const AnnouncementsPage = () => {
     } finally {
       setPreviewLoading(false);
     }
+  };
+
+  const handlePreviewPdf = (ann) => {
+    setPreviewTitle(language === 'en' ? ann.title : (ann.title_mr || ann.title));
+    setPreviewType('pdf');
+    setPreviewUrl(ann.file_path);
+    setIsPreviewModalOpen(true);
   };
 
   const handleFileChange = (e) => {
@@ -257,6 +267,16 @@ const AnnouncementsPage = () => {
                         <Eye size={14} />
                       </button>
                     )}
+                    {ann.file_name?.toLowerCase().endsWith('.pdf') && (
+                      <button
+                        className="btn btn--secondary btn--sm"
+                        style={{ padding: '6px 10px', minHeight: 'unset', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        onClick={() => handlePreviewPdf(ann)}
+                        title={language === 'en' ? 'Preview PDF' : 'परिपत्रक पहा'}
+                      >
+                        <Eye size={14} />
+                      </button>
+                    )}
                     <a 
                       href={`/api/announcements/${ann.id}/download`} 
                       download 
@@ -369,42 +389,53 @@ const AnnouncementsPage = () => {
         </form>
       </Modal>
 
-      {/* CSV Preview Modal */}
+      {/* Document Preview Modal (CSV or PDF) */}
       <Modal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
-        title={`${language === 'en' ? 'CSV Preview' : 'CSV पूर्वावलोकन'} - ${previewTitle}`}
+        title={`${previewType === 'csv' ? (language === 'en' ? 'CSV Preview' : 'CSV पूर्वावलोकन') : (language === 'en' ? 'Circular PDF Preview' : 'परिपत्रक पीडीएफ पूर्वावलोकन')} - ${previewTitle}`}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {previewLoading ? (
-            <div style={{ textAlign: 'center', padding: '32px' }}>
-              <div className="spinner" style={{ margin: '0 auto' }}></div>
-              <p style={{ marginTop: '12px', color: 'var(--text-secondary)' }}>Loading preview...</p>
-            </div>
-          ) : previewData.length > 0 ? (
-            <div style={{ overflowX: 'auto', maxHeight: '50vh', border: '1px solid var(--border-glass)', borderRadius: '8px' }}>
-              <table className="data-table" style={{ width: 'max-content', minWidth: '100%', fontSize: '0.85rem' }}>
-                <thead>
-                  <tr>
-                    {previewData[0].map((cell, idx) => (
-                      <th key={idx}>{cell}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {previewData.slice(1).map((row, rowIdx) => (
-                    <tr key={rowIdx}>
-                      {row.map((cell, cellIdx) => (
-                        <td key={cellIdx}>{cell}</td>
+          {previewType === 'csv' ? (
+            previewLoading ? (
+              <div style={{ textAlign: 'center', padding: '32px' }}>
+                <div className="spinner" style={{ margin: '0 auto' }}></div>
+                <p style={{ marginTop: '12px', color: 'var(--text-secondary)' }}>Loading preview...</p>
+              </div>
+            ) : previewData.length > 0 ? (
+              <div style={{ overflowX: 'auto', maxHeight: '50vh', border: '1px solid var(--border-glass)', borderRadius: '8px' }}>
+                <table className="data-table" style={{ width: 'max-content', minWidth: '100%', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr>
+                      {previewData[0].map((cell, idx) => (
+                        <th key={idx}>{cell}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {previewData.slice(1).map((row, rowIdx) => (
+                      <tr key={rowIdx}>
+                        {row.map((cell, cellIdx) => (
+                          <td key={cellIdx}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                No data available to preview.
+              </div>
+            )
           ) : (
-            <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
-              No data available to preview.
+            /* PDF Preview */
+            <div style={{ width: '100%', height: '65vh', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
+              <iframe 
+                src={previewUrl} 
+                title="PDF Preview" 
+                style={{ width: '100%', height: '100%', border: 'none' }}
+              />
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
