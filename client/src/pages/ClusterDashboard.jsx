@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getSchools, getSchoolDataSummary } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import StatsCard from '../components/StatsCard';
-import { School, Users, GraduationCap, UserPlus, Eye, Plus, ArrowRight, ClipboardList, FileSpreadsheet } from 'lucide-react';
+import { School, Users, GraduationCap, UserPlus, Eye, Plus, ArrowRight, ClipboardList, FileSpreadsheet, Megaphone } from 'lucide-react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
