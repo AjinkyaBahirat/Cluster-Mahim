@@ -98,15 +98,32 @@ router.get('/', async (req, res) => {
 });
 
 // ── POST /api/students ─────────────────────────────────────────────────────────
-// Bulk upsert student records (HM only).
-// Body: { records: [{ standard, total_boys, total_girls }], academic_year? }
-router.post('/', requireRole('hm'), async (req, res) => {
+// Bulk upsert student records (HM or Cluster).
+// Body: { school_id?, records: [{ standard, total_boys, total_girls }], academic_year? }
+router.post('/', async (req, res) => {
   try {
-    const { records, academic_year } = req.body;
+    const { school_id, records, academic_year } = req.body;
     const year = academic_year || '2025-26';
 
     if (!records || !Array.isArray(records) || records.length === 0) {
       return res.status(400).json({ error: 'records array is required and must not be empty.' });
+    }
+
+    let schoolId = null;
+    if (req.user.role === 'hm') {
+      schoolId = req.user.school_id;
+    } else if (req.user.role === 'cluster') {
+      schoolId = school_id ? parseInt(school_id, 10) : null;
+      if (!schoolId) {
+        return res.status(400).json({ error: 'school_id is required for cluster officer.' });
+      }
+      // Verify school ownership
+      const school = await db.get('SELECT id FROM schools WHERE id = ? AND cluster_id = ?', [schoolId, req.user.id]);
+      if (!school) {
+        return res.status(403).json({ error: 'Access denied. School does not belong to your cluster.' });
+      }
+    } else {
+      return res.status(403).json({ error: 'Access denied.' });
     }
 
     // Bulk upsert using Postgres Transaction
@@ -125,7 +142,7 @@ router.post('/', requireRole('hm'), async (req, res) => {
             total_girls = EXCLUDED.total_girls,
             updated_at = CURRENT_TIMESTAMP
         `, [
-          req.user.school_id,
+          schoolId,
           record.standard,
           record.total_boys || 0,
           record.total_girls || 0,
@@ -138,9 +155,8 @@ router.post('/', requireRole('hm'), async (req, res) => {
       throw txErr;
     }
 
-    // Return all records for this school
-    const allRecords = await db.all('SELECT * FROM student_records WHERE school_id = ? ORDER BY standard ASC', [req.user.school_id]);
-    res.status(201).json(allRecords);
+    const updatedRecords = await db.all('SELECT * FROM student_records WHERE school_id = ? AND academic_year = ? ORDER BY standard ASC', [schoolId, year]);
+    res.json(updatedRecords);
   } catch (err) {
     console.error('Upsert student records error:', err.message);
     if (err.message.includes('Invalid standard')) {

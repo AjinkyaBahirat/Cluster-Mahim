@@ -124,6 +124,17 @@ const HMDashboard = () => {
           </div>
           <ArrowRight size={20} style={{ color: 'var(--text-muted)' }} />
         </Link>
+
+        <Link to="/hm/excel" className="card" style={{ textDecoration: 'none', display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <div className="stats-card__icon-wrap" style={{ borderColor: 'rgba(236, 72, 153, 0.2)', background: 'rgba(236, 72, 153, 0.08)' }}>
+            <FileSpreadsheet size={24} style={{ color: '#ec4899' }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{t('nav.excel')}</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{language === 'en' ? 'Upload and manage Excel spreadsheet reports' : 'एक्सेल अहवाल आणि फाइल्स अपलोड किंवा व्यवस्थापित करा'}</p>
+          </div>
+          <ArrowRight size={20} style={{ color: 'var(--text-muted)' }} />
+        </Link>
       </div>
 
       <div className="card" style={{ display: 'flex', gap: '20px', flexDirection: 'column' }}>

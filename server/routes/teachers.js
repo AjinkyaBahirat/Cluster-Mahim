@@ -43,13 +43,30 @@ router.get('/', async (req, res) => {
 });
 
 // ── POST /api/teachers ─────────────────────────────────────────────────────────
-// Create a teacher (HM only). Assigned to the HM's school.
-router.post('/', requireRole('hm'), async (req, res) => {
+// Create a teacher (HM or Cluster).
+router.post('/', async (req, res) => {
   try {
     const { name, phone, category, dob, doj, doj_this_school, tet, ctet_year, designation } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Teacher name is required.' });
+    }
+
+    let schoolId = null;
+    if (req.user.role === 'hm') {
+      schoolId = req.user.school_id;
+    } else if (req.user.role === 'cluster') {
+      schoolId = req.body.school_id ? parseInt(req.body.school_id, 10) : null;
+      if (!schoolId) {
+        return res.status(400).json({ error: 'school_id is required for cluster officer.' });
+      }
+      // Verify school ownership
+      const school = await db.get('SELECT id FROM schools WHERE id = ? AND cluster_id = ?', [schoolId, req.user.id]);
+      if (!school) {
+        return res.status(403).json({ error: 'Access denied. School does not belong to your cluster.' });
+      }
+    } else {
+      return res.status(403).json({ error: 'Access denied.' });
     }
 
     const result = await db.run(`
@@ -66,7 +83,7 @@ router.post('/', requireRole('hm'), async (req, res) => {
       tet || null,
       ctet_year || null,
       designation || 'Assistant Teacher',
-      req.user.school_id
+      schoolId
     ]);
 
     const teacher = await db.get('SELECT * FROM teachers WHERE id = ?', [result.lastInsertRowid]);

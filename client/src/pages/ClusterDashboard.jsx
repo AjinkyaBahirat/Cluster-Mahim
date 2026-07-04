@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getSchools, getSchoolDataSummary } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import StatsCard from '../components/StatsCard';
-import { School, Users, GraduationCap, UserPlus, Eye, Plus, ArrowRight } from 'lucide-react';
+import { School, Users, GraduationCap, UserPlus, Eye, Plus, ArrowRight, ClipboardList, FileSpreadsheet } from 'lucide-react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -175,6 +175,37 @@ const ClusterDashboard = () => {
         <StatsCard icon={Users} label={t('stats.teachers')} value={totalTeachers} color="#10b981" />
         <StatsCard icon={GraduationCap} label={t('stats.students')} value={totalStudents} color="#f59e0b" />
         <StatsCard icon={UserPlus} label={t('stats.hms')} value={`${totalHMs}/${totalSchools}`} color="#3b82f6" />
+      </div>
+
+      {/* Mobile Navigation Grid */}
+      <div className="mobile-nav-grid">
+        <Link to="/cluster/schools" className="card hover-lift" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', textAlign: 'center', gap: '12px' }}>
+          <div className="stats-card__icon-wrap" style={{ width: '48px', height: '48px', margin: 0, borderColor: 'rgba(108, 92, 231, 0.2)', background: 'rgba(108, 92, 231, 0.08)' }}>
+            <School size={22} style={{ color: 'var(--accent-primary)' }} />
+          </div>
+          <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{t('nav.schools')}</span>
+        </Link>
+        
+        <Link to="/cluster/forms" className="card hover-lift" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', textAlign: 'center', gap: '12px' }}>
+          <div className="stats-card__icon-wrap" style={{ width: '48px', height: '48px', margin: 0, background: 'rgba(16, 185, 129, 0.08)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+            <ClipboardList size={22} style={{ color: 'var(--success)' }} />
+          </div>
+          <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{language === 'en' ? 'Forms & Surveys' : 'फॉर्म व सर्वेक्षण'}</span>
+        </Link>
+
+        <Link to="/cluster/announcements" className="card hover-lift" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', textAlign: 'center', gap: '12px' }}>
+          <div className="stats-card__icon-wrap" style={{ width: '48px', height: '48px', margin: 0, background: 'rgba(245, 158, 11, 0.08)', borderColor: 'rgba(245, 158, 11, 0.2)' }}>
+            <Megaphone size={22} style={{ color: 'var(--warning)' }} />
+          </div>
+          <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{language === 'en' ? 'Notices' : 'सूचना व परिपत्रके'}</span>
+        </Link>
+
+        <Link to="/cluster/excel" className="card hover-lift" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', textAlign: 'center', gap: '12px' }}>
+          <div className="stats-card__icon-wrap" style={{ width: '48px', height: '48px', margin: 0, background: 'rgba(59, 130, 246, 0.08)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
+            <FileSpreadsheet size={22} style={{ color: 'var(--info)' }} />
+          </div>
+          <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{language === 'en' ? 'Excel Sheets' : 'एक्सेल अहवाल'}</span>
+        </Link>
       </div>
 
       {totalSchools > 0 ? (

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getTeachers, createTeacher, updateTeacher, deleteTeacher } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import Modal from '../components/Modal';
 import WizardForm from '../components/WizardForm';
 import DataTable from '../components/DataTable';
-import { Plus, Users, Edit, Trash2 } from 'lucide-react';
+import { Plus, Users, Edit, Trash2, ArrowLeft } from 'lucide-react';
 
 const TeachersPage = () => {
   const { t, language } = useLanguage();
@@ -231,14 +232,19 @@ const TeachersPage = () => {
         </div>
       )}
 
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">{t('teachers.title')}</h1>
-          <p className="page-subtitle">{t('teachers.subtitle')}</p>
+      <div>
+        <Link to="/hm" className="btn btn--ghost btn--sm" style={{ marginBottom: '16px', paddingLeft: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <ArrowLeft size={16} /> {t('action.back')}
+        </Link>
+        <div className="page-header" style={{ marginTop: 0 }}>
+          <div>
+            <h1 className="page-title">{t('teachers.title')}</h1>
+            <p className="page-subtitle">{t('teachers.subtitle')}</p>
+          </div>
+          <button className="btn btn--primary" onClick={handleOpenAdd}>
+            <Plus size={18} /> {t('teachers.add')}
+          </button>
         </div>
-        <button className="btn btn--primary" onClick={handleOpenAdd}>
-          <Plus size={18} /> {t('teachers.add')}
-        </button>
       </div>
 
       {loading ? (

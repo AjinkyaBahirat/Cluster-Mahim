@@ -48,11 +48,27 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/schooldata
-// HM only: Update/Upsert school data
-router.post('/', requireRole('hm'), async (req, res) => {
+// HM or Cluster: Update/Upsert school data
+router.post('/', async (req, res) => {
   try {
-    const { total_students, male_students, female_students, uniform_distributed, books_distributed, cctv_available, toilets_available, holding_account_number, academic_year = '2025-26' } = req.body;
-    const schoolId = req.user.school_id;
+    const { school_id, total_students, male_students, female_students, uniform_distributed, books_distributed, cctv_available, toilets_available, holding_account_number, academic_year = '2025-26' } = req.body;
+    
+    let schoolId = null;
+    if (req.user.role === 'hm') {
+      schoolId = req.user.school_id;
+    } else if (req.user.role === 'cluster') {
+      schoolId = school_id ? parseInt(school_id, 10) : null;
+      if (!schoolId) {
+        return res.status(400).json({ error: 'school_id is required for cluster officer.' });
+      }
+      // Verify school ownership
+      const school = await db.get('SELECT id FROM schools WHERE id = ? AND cluster_id = ?', [schoolId, req.user.id]);
+      if (!school) {
+        return res.status(403).json({ error: 'Access denied. School does not belong to your cluster.' });
+      }
+    } else {
+      return res.status(403).json({ error: 'Access denied.' });
+    }
 
     // Check if record exists
     const record = await db.get('SELECT id FROM school_data WHERE school_id = ? AND academic_year = ?', [schoolId, academic_year]);

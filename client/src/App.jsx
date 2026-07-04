@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Sidebar from './components/Sidebar'
+import BottomNav from './components/BottomNav'
 
 // Pages
 import LoginPage from './pages/LoginPage'
@@ -24,6 +25,7 @@ const Layout = () => {
       <main className="main-content">
         <Outlet />
       </main>
+      <BottomNav />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getSchoolData, saveSchoolData, getForms, getForm, submitFormResponse } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
-import { Save, AlertCircle, Check, ClipboardList, HelpCircle, Camera, Building } from 'lucide-react';
+import { Save, AlertCircle, Check, ClipboardList, HelpCircle, Camera, Building, ArrowLeft } from 'lucide-react';
 
 const StudentRecordsPage = () => {
   const { t, language } = useLanguage();
@@ -243,21 +244,26 @@ const StudentRecordsPage = () => {
         </div>
       )}
 
-      <div className="page-header" style={{ marginBottom: 0 }}>
-        <div>
-          <h1 className="page-title">{t('nav.schooldata')}</h1>
-          <p className="page-subtitle">{t('schooldata.subtitle')}</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {hasChanges ? (
-            <span className="badge badge--warning" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <AlertCircle size={14} /> {t('schooldata.unsaved')}
-            </span>
-          ) : (
-            <span className="badge badge--success" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Check size={14} /> {t('schooldata.allsaved')}
-            </span>
-          )}
+      <div>
+        <Link to="/hm" className="btn btn--ghost btn--sm" style={{ marginBottom: '16px', paddingLeft: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <ArrowLeft size={16} /> {t('action.back')}
+        </Link>
+        <div className="page-header" style={{ marginTop: 0, marginBottom: 0 }}>
+          <div>
+            <h1 className="page-title">{t('nav.schooldata')}</h1>
+            <p className="page-subtitle">{t('schooldata.subtitle')}</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {hasChanges ? (
+              <span className="badge badge--warning" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={14} /> {t('schooldata.unsaved')}
+              </span>
+            ) : (
+              <span className="badge badge--success" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Check size={14} /> {t('schooldata.allsaved')}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
